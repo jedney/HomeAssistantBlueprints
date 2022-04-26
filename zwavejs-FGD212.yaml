@@ -1,5 +1,5 @@
 blueprint:
-  name: ZWaveJS - Fibaro Dimmer - S1 and S2 Scenes
+  name: ZWaveJS - Fibaro Dimmer 2 - S1 and S2 Scenes
   description: "Perform actions when a Fibaro dimmer buttons is pressed."
   domain: automation
   input:
@@ -9,7 +9,7 @@ blueprint:
       selector:
         device:
           integration: zwave_js
-          model: FGD212 FGD211
+          model: FGD212
     s1_button_once:
        name: S1 Button Once
        description: Pick an action for when the s1 button is pressed once.
