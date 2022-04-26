@@ -9,10 +9,7 @@ blueprint:
       selector:
         device:
           integration: zwave_js
-          model: FGD212
-        device:
-          integration: zwave_js
-          model: FGD211
+          model: FGD212 FGD211
     s1_button_once:
        name: S1 Button Once
        description: Pick an action for when the s1 button is pressed once.
