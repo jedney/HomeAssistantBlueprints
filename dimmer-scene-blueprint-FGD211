@@ -1,0 +1,134 @@
+blueprint:
+  name: ZWaveJS - Fibaro Dimmer - S1 and S2 Scenes
+  description: "Perform actions when a Fibaro dimmer buttons is pressed."
+  domain: automation
+  input:
+    zwavejs_device:
+      name: ZWaveJS Device
+      description: The Fibaro Dimmer button events.
+      selector:
+        device:
+          integration: zwave_js
+          model: FGD211
+    s1_button_once:
+       name: S1 Button Once
+       description: Pick an action for when the s1 button is pressed once.
+       selector:
+         action: {}
+       default: []
+    s1_button_twice:
+      name: S1 Button Twice
+      description: Pick an action for when the s1 button is pressed twice.
+      selector:
+        action: {}
+      default: []
+    s1_button_trice:
+      name: S1 Button Three Times
+      description: Pick an action for when the s1 button is pressed three times.
+      selector:
+        action: {}
+      default: []
+    s1_button_hold:
+      name: S1 Button Hold
+      description: Pick an action for when the s1 button is hold.
+      selector:
+        action: {}
+      default: []
+    s2_button_once:
+      name: S2 Button Once
+      description: Pick an action for when the s2 button is pressed once.
+      selector:
+        action: {}
+      default: []
+    s2_button_twice:
+      name: S2 Button Twice
+      description: Pick an action for when the s2 button is pressed twice.
+      selector:
+        action: {}
+      default: []
+    s2_button_trice:
+      name: S2 Button Three Times
+      description: Pick an action for when the s2 button is pressed three times.
+      selector:
+        action: {}
+      default: []
+    s2_button_hold:
+      name: S2 Button Hold
+      description: Pick an action for when the s2 button is hold.
+      selector:
+        action: {}
+      default: []
+    any_button:
+      name: Any Button action
+      description: Pick an action for when any of the buttons are used
+      selector:
+        action: {}
+      default: []
+mode: single
+
+trigger:
+- platform: event
+  event_type: zwave_js_value_notification
+
+variables:
+  logger: blueprint.zwavejs_scene_activation
+  zwavejs_device: !input 'zwavejs_device'
+
+action:
+- choose:
+  - conditions:
+    - condition: template
+      value_template: '{{ trigger.event.data.device_id == zwavejs_device }}'
+    - condition: template
+      value_template: '{{ trigger.event.data.command_class_name == "Scene Activation"}}'
+    sequence:
+    - choose:
+      - conditions:
+        - condition: template
+          value_template: "{{ trigger.event.data.value == 16 }}"
+        sequence: !input "s1_button_once"
+      - conditions:
+        - condition: template
+          value_template: "{{ trigger.event.data.value == 14 }}"
+        sequence: !input "s1_button_twice"
+      - conditions:
+        - condition: template
+          value_template: "{{ trigger.event.data.value == 15 }}"
+        sequence: !input "s1_button_trice"
+      - conditions:
+        - condition: template
+          value_template: "{{ trigger.event.data.value == 12 }}"
+        sequence: !input "s1_button_hold"
+      - conditions:
+        - condition: template
+          value_template: "{{ trigger.event.data.value == 26 }}"
+        sequence: !input "s2_button_once"
+      - conditions:
+        - condition: template
+          value_template: "{{ trigger.event.data.value == 24 }}"
+        sequence: !input "s2_button_twice"
+      - conditions:
+        - condition: template
+          value_template: "{{ trigger.event.data.value == 25 }}"
+        sequence: !input "s2_button_trice"
+      - conditions:
+        - condition: template
+          value_template: "{{ trigger.event.data.value == 22 }}"
+        sequence: !input "s2_button_hold"
+      default: 
+
+    - choose:
+       - conditions:
+         - condition: template
+           value_template: "{{ trigger.event.data.value != unknown }}"
+         sequence: !input "any_button"
+      default:
+
+      - service: system_log.write
+        data:
+          level: debug
+          logger: '{{ logger }}'
+          message: Activated scene '{{ trigger.event.data.label }}' with value '{{
+            trigger.event.data.value }}' for node '{{ zwavejs_device }}' ({{ trigger.event.data.node_id
+            }})
+  default: []
